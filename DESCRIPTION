@@ -2,37 +2,34 @@ Package: survblendr
 Type: Package
 Title: Adaptive Spline-Weighted Blending for Survival Extrapolation
 Version: 0.1.0
-Authors@R: 
-    c(person("Hao", "Chen", role = c("aut","cre")),
-      person("Clara", "Grazian", role = "aut"))
-Description: Adaptive spline-weighted blended survival extrapolation on the cumulative hazard scale. Combines a piecewise-exponential (Cox-type) model with a first-order random-walk (RW1) prior fitted via INLA (observation side) and an anchor-identified Gompertz tail (external side). The time-varying weight is obtained by fitting a monotone P-spline (SCAM) to the log-cumulative-hazard contrast and mapped through a logistic link; a temperature parameter is selected to guarantee nonnegative blended hazards on a grid. Includes diagnostics, plots, and summary metrics for simulation and real-world use.
+Authors@R: c(
+    person("Hao", "Chen", email = "hche2036@uni.sydney.edu.au", role = c("aut","cre"))
+)
+Description: One-shot survival extrapolation combining a piecewise-exponential
+    model fitted via INLA over the observed window with an anchored Gompertz tail,
+    blended on the cumulative-hazard scale using monotone P-spline weights.
 License: MIT + file LICENSE
-URL: https://github.com/haohaostats/survblendr
+URL: https://github.com/haohaostats/survblendr, https://haohaostats.github.io/survblendr
 BugReports: https://github.com/haohaostats/survblendr/issues
-Depends: 
-    R (>= 4.1.0)
+Depends: R (>= 4.0)
 Imports:
-    INLA,
-    withr,
-    survival,
-    scam,
-    mgcv,
-    ggplot2,
-    Matrix,
-    tibble,
     stats,
-    graphics,
-    grDevices,
-    utils
+    utils,
+    ggplot2,
+    survival,
+    INLA,
+    mgcv,
+    scam,
+    withr
 Suggests:
-    testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    devtools
-Encoding: UTF-8
-LazyData: true
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Config/testthat/edition: 3
+    testthat (>= 3.0.0),
+    pkgdown
 VignetteBuilder: knitr
-
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Config/testthat/edition: 3
+Additional_repositories: https://inla.r-inla-download.org/R/stable
