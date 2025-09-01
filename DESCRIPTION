@@ -2,14 +2,10 @@ Package: survblendr
 Type: Package
 Title: Adaptive Spline-Weighted Blending for Survival Extrapolation
 Version: 0.1.0
-Authors@R: c(
-    person("Hao", "Chen", email = "hche2036@uni.sydney.edu.au", role = c("aut","cre"))
-)
-Description: One-shot survival extrapolation combining a piecewise-exponential
-    model fitted via INLA over the observed window with an anchored Gompertz tail,
-    blended on the cumulative-hazard scale using monotone P-spline weights.
+Authors@R: c(person("Hao", "Chen", email = "hche2036@uni.sydney.edu.au", role = c("aut","cre")))
+Description: Survival extrapolation by spline-weighted blending of a piecewise-exponential model fitted via INLA over the observed window and an anchored Gompertz tail.
 License: MIT + file LICENSE
-URL: https://github.com/haohaostats/survblendr, https://haohaostats.github.io/survblendr
+URL: https://github.com/haohaostats/survblendr
 BugReports: https://github.com/haohaostats/survblendr/issues
 Depends: R (>= 4.0)
 Imports:
@@ -30,6 +26,5 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
 Config/testthat/edition: 3
 Additional_repositories: https://inla.r-inla-download.org/R/stable
