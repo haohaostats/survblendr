@@ -12,8 +12,6 @@ draw_ext_gompertz <- function(times, t_a, S_a_mean, ess_Sa = 50,
                               nsim = 2000,
                               anchor_type = c("beta", "fixed")) {
   anchor_type <- match.arg(anchor_type)
-  
-  # 直接抽样；随机性已由 aswb_extrapolate() 的 local_seed 统一控制
   if (anchor_type == "fixed" || is.infinite(ess_Sa)) {
     Sa <- rep(S_a_mean, nsim)
   } else {

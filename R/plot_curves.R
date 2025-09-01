@@ -5,7 +5,7 @@
 #' Shows Kaplan–Meier (step), Cox(PEM), External(Gompertz) and Blended(Spline).
 #' For Cox/External, draw solid up to t0 and dashed from t0 onward, with no visual gap.
 #'
-#' @param fit object from [aswb_extrapolate()], must contain $time, $S_obs, $S_ext, $S_blend;
+#' @param fit object from [survblendr_extrapolate()], must contain $time, $S_obs, $S_ext, $S_blend;
 #'   if `fit$train` has `time`/`status`, a KM curve is added automatically.
 #' @param add_true optional numeric vector (same length as `fit$time`) for simulations.
 #' @param t0 optional; if NULL, inferred from `fit$t_obs` or max(fit$train$time).
@@ -19,7 +19,6 @@ plot_curves <- function(
   stopifnot(is.list(fit), !is.null(fit$time))
   time <- as.numeric(fit$time)
   
-  ## ---- t0 detection ----
   t0_line <- if (!is.null(t0)) {
     as.numeric(t0)
   } else if (!is.null(fit$t_obs)) {
@@ -28,7 +27,6 @@ plot_curves <- function(
     suppressWarnings(max(as.numeric(fit$train$time), na.rm = TRUE))
   } else NA_real_
   
-  ## ---- colors (Okabe–Ito) ----
   cols <- c(
     "True"                = "#000000",
     "Kaplan–Meier"        = "#56B4E9",
@@ -38,7 +36,6 @@ plot_curves <- function(
   )
   legend_levels <- c("True","Kaplan–Meier","Cox (PEM)","External (Gompertz)","Blended (Spline)")
   
-  ## ---- long data for model-based series ----
   ser <- list(
     "Cox (PEM)"           = fit$S_obs,
     "External (Gompertz)" = fit$S_ext,
@@ -57,7 +54,6 @@ plot_curves <- function(
   long <- long[is.finite(long$S), , drop = FALSE]
   long$series <- factor(long$series, levels = legend_levels)
   
-  ## ---- KM (step) 到 t0 ----
   km_df <- NULL
   if (!is.null(fit$train) && all(c("time","status") %in% names(fit$train))) {
     sf <- survival::survfit(survival::Surv(time, status) ~ 1, data = fit$train)
@@ -72,7 +68,6 @@ plot_curves <- function(
     km_df <- data.frame(time = km_time, S = km_surv, series = "Kaplan–Meier")
   }
   
-  ## ---- split Cox / External into <=t0 (solid) and >=t0 (dashed) ----
   split_series <- function(df, nm) {
     d <- df[df$series == nm, , drop = FALSE]
     if (!nrow(d)) return(list(pre = NULL, post = NULL))
@@ -96,7 +91,6 @@ plot_curves <- function(
   bl <- long[long$series == "Blended (Spline)", , drop = FALSE]
   tr <- long[long$series == "True",              , drop = FALSE]
   
-  ## ---- build plot ----
   p <- ggplot2::ggplot()
   
   if (isTRUE(shade_extrap) && is.finite(t0_line)) {
@@ -120,14 +114,12 @@ plot_curves <- function(
     linewidth = 1.4, na.rm = TRUE
   )
   
-  # Blended (always solid)
   if (nrow(bl)) p <- p + ggplot2::geom_line(
     data = bl,
     ggplot2::aes(x = time, y = S, color = "Blended (Spline)"),
     linewidth = 1.4, na.rm = TRUE
   )
   
-  # Cox pre/post
   if (nrow(cx$pre))  p <- p + ggplot2::geom_line(
     data = cx$pre,
     ggplot2::aes(x = time, y = S, color = "Cox (PEM)"),
@@ -139,7 +131,6 @@ plot_curves <- function(
     linewidth = 1.4, linetype = "dashed", lineend = "butt", na.rm = TRUE
   )
   
-  # External pre/post
   if (nrow(ex$pre))  p <- p + ggplot2::geom_line(
     data = ex$pre,
     ggplot2::aes(x = time, y = S, color = "External (Gompertz)"),

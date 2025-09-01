@@ -62,7 +62,6 @@ pem_fit_inla <- function(df, t_obs, t_max, interval = 1,
   if (K_got == K_expected + 1L) sbh <- sbh[seq_len(K_expected), , drop = FALSE]
   if (nrow(sbh) != K_expected) stop("Baseline segments mismatch.")
   
-  # joint posterior sample -> baseline hazard draws
   use_marginal_fallback <- FALSE
   jp <- try(
     INLA::inla.posterior.sample(

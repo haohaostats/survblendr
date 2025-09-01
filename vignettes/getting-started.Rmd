@@ -1,9 +1,9 @@
 
 ---
-  title: "ASWB：快速上手"
+  title: "survblendr：快速上手"
 output: html_vignette
 vignette: >
-  %\VignetteIndexEntry{ASWB：快速上手}
+  %\VignetteIndexEntry{survblendr：快速上手}
 %\VignetteEngine{knitr::rmarkdown}
 \usepackage[utf8]{inputenc}
 ---

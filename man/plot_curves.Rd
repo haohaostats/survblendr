@@ -17,7 +17,7 @@ plot_curves(
 )
 }
 \arguments{
-\item{fit}{object from \code{\link[=aswb_extrapolate]{aswb_extrapolate()}}, must contain $time, $S_obs, $S_ext, $S_blend;
+\item{fit}{object from \code{\link[=survblendr_extrapolate]{survblendr_extrapolate()}}, must contain $time, $S_obs, $S_ext, $S_blend;
 if \code{fit$train} has \code{time}/\code{status}, a KM curve is added automatically.}
 
 \item{add_true}{optional numeric vector (same length as \code{fit$time}) for simulations.}

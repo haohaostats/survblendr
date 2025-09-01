@@ -1,10 +1,12 @@
 
 #' Path to the packaged example CSV
-#' @return A file path to `inst/extdata/aswb_demo.csv`.
+#' @return A file path to `inst/extdata/survblendr_demo.csv`.
 #' @export
-aswb_example_data_path <- function() {
-  system.file("extdata", "aswb_demo.csv", package = "aswb", mustWork = TRUE)
+survblendr_example_data_path <- function() {
+  system.file("extdata", "survblendr_demo.csv",
+              package = "survblendr", mustWork = TRUE)
 }
+
 
 #' Read user-provided survival data
 #'
@@ -20,7 +22,7 @@ aswb_example_data_path <- function() {
 #' @param event_value Value in `status_col` that means "event" (default 1).
 #' @return A data.frame with columns `id`, `time`, `status`.
 #' @export
-aswb_read_csv <- function(file,
+survblendr_read_csv <- function(file,
                           time_col = "time",
                           status_col = "status",
                           id_col = NULL,

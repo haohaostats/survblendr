@@ -1,4 +1,4 @@
-Package: aswb
+Package: survblendr
 Type: Package
 Title: Adaptive Spline-Weighted Blending for Survival Extrapolation
 Version: 0.1.0
@@ -7,8 +7,8 @@ Authors@R:
       person("Clara", "Grazian", role = "aut"))
 Description: Adaptive spline-weighted blended survival extrapolation on the cumulative hazard scale. Combines a piecewise-exponential (Cox-type) model with a first-order random-walk (RW1) prior fitted via INLA (observation side) and an anchor-identified Gompertz tail (external side). The time-varying weight is obtained by fitting a monotone P-spline (SCAM) to the log-cumulative-hazard contrast and mapped through a logistic link; a temperature parameter is selected to guarantee nonnegative blended hazards on a grid. Includes diagnostics, plots, and summary metrics for simulation and real-world use.
 License: MIT + file LICENSE
-URL: https://github.com/haohaostats/aswb
-BugReports: https://github.com/haohaostats/aswb/issues
+URL: https://github.com/haohaostats/survblendr
+BugReports: https://github.com/haohaostats/survblendr/issues
 Depends: 
     R (>= 4.1.0)
 Imports:

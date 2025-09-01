@@ -8,7 +8,6 @@
 #' @noRd
 clip01 <- function(x) pmin(pmax(x, 0), 1)
 
-# tiny positive time to avoid zeros
 #' @keywords internal
 #' @noRd
 tiny_time <- 1e-6
@@ -42,7 +41,6 @@ hazard_from_S <- function(times, S) {
   h
 }
 
-#' First derivative on a grid (central differences)
 #' @param x numeric increasing
 #' @param y numeric values
 #' @return numeric derivative dy/dx

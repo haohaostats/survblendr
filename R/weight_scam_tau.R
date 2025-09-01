@@ -28,8 +28,6 @@ weight_fit_scam_tau <- function(times, S_obs, S_ext, J = 10, tau_step = 1.5, tau
   H_ext <- -log(pmax(S_ext, eps))
   z <- log(pmax(H_obs, eps)) - log(pmax(H_ext, eps))
   dat <- data.frame(t = times, z = z)
-  
-  # --- the key fix: use s(...) rather than mgcv::s(...) inside the formula ---
   fit <- scam::scam(z ~ s(t, k = J, bs = "mpi"), data = dat, family = stats::gaussian())
   
   eta  <- as.numeric(stats::predict(fit, newdata = dat, type = "link"))

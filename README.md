@@ -1,8 +1,8 @@
 
-# aswb: Adaptive Spline-Weighted Blending for Survival Extrapolation
+# survblendr: Adaptive Spline-Weighted Blending for Survival Extrapolation
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-**aswb** is an R package for survival extrapolation using an adaptive spline-weighted blending method on the cumulative hazard scale. It smoothly combines a semi-parametric model fitted to the observed data with a parametric external model representing the long-term trend.
+**survblendr** is an R package for survival extrapolation using an adaptive spline-weighted blending method on the cumulative hazard scale. It smoothly combines a semi-parametric model fitted to the observed data with a parametric external model representing the long-term trend.
 
 > The core of this method is a weighted blend on the cumulative hazard scale, combining a piecewise-exponential model (PEM) fitted via INLA with a Gompertz tail model calibrated by a user-defined anchor point.
 
@@ -17,47 +17,45 @@
 
 ## Installation
 
-You can install the development version of `aswb` from GitHub using the `remotes` package.
+You can install the development version of `survblendr` from GitHub using the `remotes` package.
 
 ```R
 # Install remotes if you haven't already
 # install.packages("remotes")
 
-remotes::install_github("haohaostats/aswb")
+remotes::install_github("haohaostats/survblendr")
 ```
 
 ---
 
 ## Quick Start Example
 
-The following example demonstrates the main workflow using the `aswb_demo` dataset included with the package.
+The following example demonstrates the main workflow using the `survblendr_demo` dataset included with the package.
 
 #### 1. Load the Package and Data
 
-First, load the `aswb` package and the example dataset.
+First, load the `survblendr` package and the example dataset.
 
 ```R
-library(aswb)
+library(survblendr)
 
-# aswb_demo is a simulated dataset where follow-up is
+# survblendr_demo is a simulated dataset where follow-up is
 # administratively censored at time t=10.
-data(aswb_demo)
-head(aswb_demo)
+data(survblendr_demo)
+head(survblendr_demo)
 ```
 
 #### 2. Run the Extrapolation
 
-Use the core function `aswb_extrapolate()` to fit the models and perform the blending. We specify that the observation period ends at `t_obs = 10` and we want to extrapolate the survival curve up to `t_max = 25`. The `seed` argument ensures the results are reproducible.
+Use the core function `survblendr_extrapolate()` to fit the models and perform the blending. We specify that the observation period ends at `t_obs = 10` and we want to extrapolate the survival curve up to `t_max = 25`. The `seed` argument ensures the results are reproducible.
 
 ```R
-fit <- aswb_extrapolate(
-  df = aswb_demo,
-  t_obs = 10,
-  t_max = 25,
-  # For a quick demonstration, we use a smaller number of simulations.
-  nsim_inla = 500,
-  nsim_ext = 500,
-  seed = 123 # Set a seed for reproducible results!
+fit <- survblendr_extrapolate(
+  survblendr_demo, t_obs = 10, t_max = 25, interval = 1,
+  anchor_t = 25, anchor_mean_Sa = 0.035,
+  nsim_inla = 2000, nsim_ext = 2000,
+  inla_threads = 1,
+  seed = 20240901
 )
 ```
 
@@ -70,16 +68,17 @@ p <- plot_curves(fit)
 print(p)
 ```
 
-![ASWB Plot Example](https://raw.githubusercontent.com/haohaostats/aswb/main/man/figures/example_plot.svg)
+![survblendr Plot Example](https://raw.githubusercontent.com/haohaostats/survblendr/main/man/figures/example_plot.svg)
 
 #### 4. Summarize the Results
 
-Finally, use `aswb_summary_table()` to generate a table of key metrics, such as the predicted survival probability and the Restricted Mean Survival Time (RMST) calculated from time 0 up to each specified year.
+Finally, use `survblendr_summary_table()` to generate a table of key metrics, such as the predicted survival probability and the Restricted Mean Survival Time (RMST) calculated from time 0 up to each specified year.
 
 ```R
 # Get an annual summary from year 10 to 25
-summary_df <- aswb_summary_table(fit, years = 10:25)
+summary_df <- survblendr_summary_table(fit, years = 10:25)
 print(summary_df)
+knitr::kable(summary_df, digits = 3, format = "pipe")
 ```
 
 | time| S_obs| S_ext| S_blend| RMST_obs| RMST_ext| RMST_blend|

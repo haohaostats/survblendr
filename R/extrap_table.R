@@ -6,7 +6,7 @@
 #' to the end of the grid), reporting the blended survival at each whole
 #' year and the RMST of the blended curve from `t_obs` up to that year.
 #'
-#' @param fit A list returned by [aswb_extrapolate()].
+#' @param fit A list returned by [survblendr_extrapolate()].
 #' @param by Step size for reporting (time units). Default 1 (yearly).
 #' @return A `data.frame` with columns:
 #'   - `time`: reporting time points (>= `t_obs`).
@@ -16,12 +16,11 @@
 #' @details
 #' Survival values are taken on the nearest grid point of `fit$time`.
 #' @export
-aswb_extrap_table <- function(fit, by = 1) {
+survblendr_extrap_table <- function(fit, by = 1) {
   stopifnot(is.list(fit), !is.null(fit$time), !is.null(fit$S_blend))
   time <- as.numeric(fit$time)
   t0   <- if (!is.null(fit$t_obs)) fit$t_obs else min(time)
-  
-  # reporting grid
+
   t_end <- seq(ceiling(t0), max(time), by = by)
   if (!length(t_end)) t_end <- max(time)
   
