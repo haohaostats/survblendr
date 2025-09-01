@@ -28,3 +28,4 @@ Language: en-US
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Additional_repositories: https://inla.r-inla-download.org/R/stable
+RoxygenNote: 7.3.2
