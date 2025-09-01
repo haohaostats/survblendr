@@ -1,0 +1,12 @@
+
+---
+  title: "ASWB：快速上手"
+output: html_vignette
+vignette: >
+  %\VignetteIndexEntry{ASWB：快速上手}
+%\VignetteEngine{knitr::rmarkdown}
+\usepackage[utf8]{inputenc}
+---
+  
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
