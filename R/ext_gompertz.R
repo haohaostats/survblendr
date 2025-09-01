@@ -9,12 +9,11 @@
 #' @export
 draw_ext_gompertz <- function(times, t_a, S_a_mean, ess_Sa = 50,
                               loggamma_mean, loggamma_sd,
-                              nsim = 2000, seed = NULL,
+                              nsim = 2000,
                               anchor_type = c("beta", "fixed")) {
-  if (!is.null(seed)) set.seed(seed)
   anchor_type <- match.arg(anchor_type)
   
-  # sample S_a at t_a
+  # 直接抽样；随机性已由 aswb_extrapolate() 的 local_seed 统一控制
   if (anchor_type == "fixed" || is.infinite(ess_Sa)) {
     Sa <- rep(S_a_mean, nsim)
   } else {
@@ -22,12 +21,10 @@ draw_ext_gompertz <- function(times, t_a, S_a_mean, ess_Sa = 50,
     beta  <- (1 - S_a_mean) * ess_Sa
     Sa    <- stats::rbeta(nsim, alpha, beta)
   }
-  
   gamma <- stats::rlnorm(nsim, meanlog = loggamma_mean, sdlog = loggamma_sd)
   gamma <- pmax(gamma, 1e-6)
   Sa    <- clip01(Sa)
   
-  # solve rho from S(t_a)=Sa under Gompertz S(t)=exp(-(rho/gamma)(exp(gamma t)-1))
   rho <- - gamma * log(Sa) / (exp(gamma * t_a) - 1)
   rho <- pmax(rho, 1e-10)
   

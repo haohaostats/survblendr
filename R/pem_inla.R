@@ -15,8 +15,10 @@
 #' @return List with \code{time}, \code{S_obs_draws}, \code{train}, \code{inla}.
 #' @importFrom INLA inla.coxph inla inla.posterior.sample inla.setOption
 #' @export
-pem_fit_inla <- function(df, t_obs, t_max, interval = 1, nsim = 2000, inla_threads = 1) {
-  # truncate to t_obs
+pem_fit_inla <- function(df, t_obs, t_max, interval = 1,
+                         nsim = 2000, inla_threads = 1,
+                         seed_draws = NULL) {
+  if (!is.null(seed_draws)) withr::local_seed(as.integer(seed_draws))
   train <- df
   train$status[train$time > t_obs] <- 0L
   train$time[train$time > t_obs]   <- t_obs
@@ -62,7 +64,15 @@ pem_fit_inla <- function(df, t_obs, t_max, interval = 1, nsim = 2000, inla_threa
   
   # joint posterior sample -> baseline hazard draws
   use_marginal_fallback <- FALSE
-  jp <- try(INLA::inla.posterior.sample(n = nsim, result = m), silent = TRUE)
+  jp <- try(
+    INLA::inla.posterior.sample(
+      n = nsim,
+      result = m,
+      seed = if (is.null(seed_draws)) NA_integer_ else as.integer(seed_draws)
+    ),
+    silent = TRUE
+  )
+  
   if (inherits(jp, "try-error") || length(jp) == 0L) use_marginal_fallback <- TRUE
   
   h0_draws <- NULL

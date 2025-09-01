@@ -4,7 +4,15 @@
 \alias{pem_fit_inla}
 \title{Piecewise-Exponential (PEM) short-term fit via INLA}
 \usage{
-pem_fit_inla(df, t_obs, t_max, interval = 1, nsim = 2000, inla_threads = 1)
+pem_fit_inla(
+  df,
+  t_obs,
+  t_max,
+  interval = 1,
+  nsim = 2000,
+  inla_threads = 1,
+  seed_draws = NULL
+)
 }
 \arguments{
 \item{df}{Data frame with columns \code{time}, \code{status}.}

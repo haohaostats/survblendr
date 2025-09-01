@@ -12,7 +12,6 @@ draw_ext_gompertz(
   loggamma_mean,
   loggamma_sd,
   nsim = 2000,
-  seed = NULL,
   anchor_type = c("beta", "fixed")
 )
 }

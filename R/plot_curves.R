@@ -109,7 +109,7 @@ plot_curves <- function(
     p <- p + ggplot2::geom_step(
       data = km_df,
       ggplot2::aes(x = time, y = S, color = "Kaplan–Meier"),
-      direction = "hv", linewidth = 1.0, na.rm = TRUE
+      direction = "hv", linewidth = 1.4, na.rm = TRUE
     )
   }
   
