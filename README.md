@@ -27,6 +27,9 @@ You can install the development version of `survblendr` from GitHub using the `r
 # (INLA is hosted outside CRAN; the extra repo line is a safe fallback)
 options(repos = c(getOption("repos"),
                   INLA = "https://inla.r-inla-download.org/R/stable"))
+# for the stable version:
+install.packages("INLA", repos=c(getOption("repos"), INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
+
 remotes::install_github("haohaostats/survblendr")
 ```
 
