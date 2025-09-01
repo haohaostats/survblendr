@@ -77,7 +77,6 @@ plot_curves <- function(
     d <- df[df$series == nm, , drop = FALSE]
     if (!nrow(d)) return(list(pre = NULL, post = NULL))
     if (!is.finite(t0_line)) return(list(pre = d, post = NULL))
-    # 确保 t0 行存在；若无，做线性插值插入一个 t0 点
     if (!any(abs(d$time - t0_line) < 1e-12)) {
       i <- max(which(d$time < t0_line))
       if (is.finite(i) && i < nrow(d)) {
@@ -110,7 +109,7 @@ plot_curves <- function(
     p <- p + ggplot2::geom_step(
       data = km_df,
       ggplot2::aes(x = time, y = S, color = "Kaplan–Meier"),
-      direction = "hv", linewidth = 1.4, na.rm = TRUE
+      direction = "hv", linewidth = 1.0, na.rm = TRUE
     )
   }
   
