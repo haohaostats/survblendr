@@ -88,9 +88,10 @@ print(p)
 #### 4. Summarize the Results
 
 Finally, use `survblendr_summary_table()` to generate a table of key metrics, such as the predicted survival probability and the Restricted Mean Survival Time (RMST) at target times.
-The extrapolation-period RMST is 
+The extrapolation-period RMST is defined as the integral of the survival curve from the end of observation (`t_obs`) up to the target time `t`:
+
 $$
-\mathrm{RMST}(t)=\int_{t_{\mathrm{obs}}}^{t} S(u)\,du.
+\mathrm{RMST}(t) = \int_{t_{\mathrm{obs}}}^{t} S(u) \, du
 $$
 
 ```R
