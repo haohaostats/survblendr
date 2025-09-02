@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary_table.R
 \name{survblendr_summary_table}
 \alias{survblendr_summary_table}
-\title{Summarize survival and RMST over calendar times}
+\title{Summarize survival and extrapolation RMST at target times}
 \usage{
 survblendr_summary_table(fit, years)
 }
@@ -16,7 +16,12 @@ A data.frame with columns:
 \verb{time, S_obs, S_ext, S_blend, RMST_obs, RMST_ext, RMST_blend}.
 }
 \description{
-Create a table of survival at selected times and the Restricted Mean
-Survival Time (RMST) \strong{from 0 up to each time} for the observed-side
-PEM curve, the external Gompertz tail, and the blended curve.
+Returns \code{S_obs}, \code{S_ext}, \code{S_blend} and \strong{extrapolation RMST} for each
+requested time in \code{years}. Extrapolation RMST is defined as
+\eqn{\int_{t_{\mathrm{obs}}}^{t} S(u)\,du}. For \code{years} below \code{t_obs},
+RMST is 0 by definition.
+
+RMST is computed on the \strong{reporting grid} (\code{years}) using the trapezoidal
+rule with the same survival values you see in the table, so increments
+match the displayed S at the year endpoints and remain monotone non-decreasing.
 }

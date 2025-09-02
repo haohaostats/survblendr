@@ -54,8 +54,16 @@ head(survblendr_demo)
 
 #### 2. Run the Extrapolation
 
-Use the core function `survblendr_extrapolate()` to fit the models and perform the blending. We specify that the observation period ends at `t_obs = 10` and we want to extrapolate the survival curve up to `t_max = 25`. The `seed` argument ensures the results are reproducible.
+Use the core function `survblendr_extrapolate()` to fit the models and perform the blending. In this example, our trial data (`survblendr_demo`) was observed for 10 years, and we want to project future survival up to a 25-year horizon.
 
+We configure the function with the following key parameters:
+
+* `df = survblendr_demo`: The input dataset containing `time` and `status` columns.
+* `t_obs = 10`: The time point where the trial's observation period ends. The model will use data up to this point to learn the short-term survival trend.
+* `t_max = 25`: The maximum time horizon for the extrapolation. The survival curve will be generated up to this point.
+* `anchor_t = 25`: This is the "anchor point" for the long-term external model. We are providing an external assumption about survival at this future time.
+* `anchor_mean_Sa = 0.035`: This is our expert opinion or external evidence for the anchor point. We are assuming that the mean survival probability at 25 years is 3.5%.
+* `nsim_inla = 2000` & `nsim_ext = 2000`: The number of posterior simulations to draw for the short-term (INLA) and long-term (Gompertz) models, respectively. Higher numbers lead to more stable estimates.
 ```R
 fit <- survblendr_extrapolate(
   survblendr_demo, t_obs = 10, t_max = 25, interval = 1,
@@ -79,33 +87,36 @@ print(p)
 
 #### 4. Summarize the Results
 
-Finally, use `survblendr_summary_table()` to generate a table of key metrics, such as the predicted survival probability and the Restricted Mean Survival Time (RMST) calculated from time 0 up to each specified year.
+Finally, use `survblendr_summary_table()` to generate a table of key metrics, such as the predicted survival probability and the Restricted Mean Survival Time (RMST) at target times.
+The extrapolation-period RMST is 
+$$
+\mathrm{RMST}(t)=\int_{t_{\mathrm{obs}}}^{t} S(u)\,du.
+$$
 
 ```R
-# Get an annual summary from year 10 to 25
+# Annual summary from year 10 to 25 (extrapolation-only RMST over [t_obs, t])
 summary_df <- survblendr_summary_table(fit, years = 10:25)
-print(summary_df)
 knitr::kable(summary_df, digits = 3, format = "pipe")
 ```
 
 | time| S_obs| S_ext| S_blend| RMST_obs| RMST_ext| RMST_blend|
 |----:|-----:|-----:|-------:|--------:|--------:|----------:|
-|   10| 0.274| 0.535|   0.419|    4.963|    6.626|      5.900|
-|   11| 0.218| 0.490|   0.364|    4.924|    6.912|      6.016|
-|   12| 0.172| 0.445|   0.314|    4.867|    7.134|      6.082|
-|   13| 0.136| 0.401|   0.270|    4.808|    7.294|      6.111|
-|   14| 0.110| 0.359|   0.233|    4.762|    7.396|      6.119|
-|   15| 0.091| 0.317|   0.201|    4.725|    7.442|      6.109|
-|   16| 0.076| 0.277|   0.172|    4.696|    7.438|      6.084|
-|   17| 0.064| 0.238|   0.148|    4.675|    7.389|      6.047|
-|   18| 0.056| 0.202|   0.126|    4.660|    7.301|      6.001|
-|   19| 0.049| 0.168|   0.107|    4.650|    7.183|      5.945|
-|   20| 0.043| 0.137|   0.090|    4.643|    7.042|      5.882|
-|   21| 0.038| 0.110|   0.075|    4.638|    6.888|      5.813|
-|   22| 0.035| 0.086|   0.062|    4.635|    6.731|      5.741|
-|   23| 0.032| 0.065|   0.050|    4.634|    6.582|      5.670|
-|   24| 0.029| 0.048|   0.040|    4.633|    6.447|      5.601|
-|   25| 0.026| 0.035|   0.032|    4.632|    6.332|      5.538|
+|   10| 0.274| 0.535|   0.419|    0.000|    0.000|      0.000|
+|   11| 0.218| 0.490|   0.364|    0.246|    0.512|      0.392|
+|   12| 0.172| 0.445|   0.314|    0.441|    0.980|      0.731|
+|   13| 0.136| 0.401|   0.270|    0.595|    1.403|      1.023|
+|   14| 0.110| 0.359|   0.233|    0.718|    1.783|      1.275|
+|   15| 0.091| 0.317|   0.201|    0.818|    2.121|      1.492|
+|   16| 0.076| 0.277|   0.172|    0.902|    2.418|      1.678|
+|   17| 0.064| 0.238|   0.148|    0.972|    2.675|      1.838|
+|   18| 0.056| 0.202|   0.126|    1.031|    2.896|      1.975|
+|   19| 0.049| 0.168|   0.107|    1.084|    3.081|      2.092|
+|   20| 0.043| 0.137|   0.090|    1.129|    3.234|      2.190|
+|   21| 0.038| 0.110|   0.075|    1.170|    3.357|      2.272|
+|   22| 0.035| 0.086|   0.062|    1.207|    3.455|      2.341|
+|   23| 0.032| 0.065|   0.050|    1.240|    3.530|      2.396|
+|   24| 0.029| 0.048|   0.040|    1.270|    3.587|      2.441|
+|   25| 0.026| 0.035|   0.032|    1.298|    3.629|      2.477|
 
 ---
 
@@ -115,4 +126,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 
 ## Authors
 
-Hao Chen.
+hao hao ([@haohaostats](https://github.com/haohaostats))

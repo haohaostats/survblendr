@@ -2,22 +2,24 @@
 % Please edit documentation in R/metrics.R
 \name{rmst_numeric}
 \alias{rmst_numeric}
-\title{Numerical RMST on \link{t0, t*} by trapezoidal rule}
+\title{Numerical RMST on \link{t0, t*} with endpoint interpolation}
 \usage{
 rmst_numeric(times, S, t0, t_star)
 }
 \arguments{
-\item{times}{grid}
+\item{times}{Strictly increasing time grid.}
 
-\item{S}{survival on grid}
+\item{S}{Survival values on the same grid (in \link{0, 1}).}
 
-\item{t0}{lower limit}
+\item{t0}{Lower limit (e.g., t_obs for extrapolation RMST).}
 
-\item{t_star}{upper limit}
+\item{t_star}{Upper limit.}
 }
 \value{
-scalar
+Scalar RMST on \link{t0, t_star}.
 }
 \description{
-Numerical RMST on \link{t0, t*} by trapezoidal rule
+Computes RMST over \link{t0, t_star} by linearly interpolating S at the
+interval endpoints and applying the trapezoidal rule. With S >= 0,
+the result is non-decreasing in t_star (up to tiny FP noise).
 }

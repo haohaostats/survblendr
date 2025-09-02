@@ -1,70 +1,86 @@
 
-#' Summarize survival and RMST over calendar times
+#' @title Summarize survival and extrapolation RMST at target times
+#' @name survblendr_summary_table
 #'
 #' @description
-#' Create a table of survival at selected times and the Restricted Mean
-#' Survival Time (RMST) **from 0 up to each time** for the observed-side
-#' PEM curve, the external Gompertz tail, and the blended curve.
+#' Returns `S_obs`, `S_ext`, `S_blend` and **extrapolation RMST** for each
+#' requested time in `years`. Extrapolation RMST is defined as
+#' \eqn{\int_{t_{\mathrm{obs}}}^{t} S(u)\,du}. For `years` below `t_obs`,
+#' RMST is 0 by definition.
+#'
+#' RMST is computed on the **reporting grid** (`years`) using the trapezoidal
+#' rule with the same survival values you see in the table, so increments
+#' match the displayed S at the year endpoints and remain monotone non-decreasing.
 #'
 #' @param fit A list returned by [survblendr_extrapolate()].
 #' @param years Numeric vector of target times (e.g., `10:25`).
-#'
 #' @return A data.frame with columns:
-#' `time, S_obs, S_ext, S_blend, RMST_obs, RMST_ext, RMST_blend`.
+#'   `time, S_obs, S_ext, S_blend, RMST_obs, RMST_ext, RMST_blend`.
 #' @export
 survblendr_summary_table <- function(fit, years) {
   stopifnot(all(c("time","S_obs","S_ext","S_blend") %in% names(fit)))
+  
   times <- as.numeric(fit$time)
-  Sobs  <- as.numeric(fit$S_obs)
-  Sext  <- as.numeric(fit$S_ext)
-  Sbl   <- as.numeric(fit$S_blend)
+  Sobs  <- pmin(pmax(as.numeric(fit$S_obs),   0), 1)
+  Sext  <- pmin(pmax(as.numeric(fit$S_ext),   0), 1)
+  Sbl   <- pmin(pmax(as.numeric(fit$S_blend), 0), 1)
   
-  trapz <- function(x, y) sum(diff(x) * (head(y, -1) + tail(y, 1)) / 2)
-  s_at <- function(x, y, x0) {
-    eps <- 1e-12
-    if (x0 <= max(x) && x0 >= min(x)) {
-      return(stats::approx(x, y, xout = x0, rule = 2)$y)
-    }
-    if (x0 > max(x)) {
-      x1 <- x[length(x) - 1]; x2 <- x[length(x)]
-      y1 <- pmax(y[length(y) - 1], eps); y2 <- pmax(y[length(y)], eps)
-    } else { # x0 < min(x), use first two points (rare in practice)
-      x1 <- x[1]; x2 <- x[2]
-      y1 <- pmax(y[1], eps); y2 <- pmax(y[2], eps)
-    }
-    b <- (log(y2) - log(y1)) / (x2 - x1)
-    a <- log(y2) - b * x2
-    val <- exp(a + b * x0)
-    pmin(pmax(val, 0), 1)
+  t0 <- if (!is.null(fit$t_obs)) fit$t_obs else min(times)
+  
+  s_at <- function(S, tt) {
+    vals <- stats::approx(times, S, xout = tt, rule = 2)$y
+    pmin(pmax(vals, 0), 1)
   }
   
-  rmst_to <- function(t, x, y) {
-    if (t <= min(x)) {
-      return(t * s_at(x, y, t))  
+  yrs_in  <- as.numeric(years)
+  yrs_ord <- order(yrs_in)
+  yrs     <- yrs_in[yrs_ord]
+  grid    <- sort(unique(c(t0, yrs)))
+  
+  Sobs_g <- s_at(Sobs, grid)
+  Sext_g <- s_at(Sext, grid)
+  Sbl_g  <- s_at(Sbl,  grid)
+  
+  cumtrapz_from_t0 <- function(x, y) {
+    i0 <- match(t0, x)
+    n  <- length(x)
+    area <- numeric(n)
+    if (n >= 2) {
+      for (i in seq.int(i0 + 1L, n)) {
+        area[i] <- area[i - 1L] + (x[i] - x[i - 1L]) * (y[i] + y[i - 1L]) / 2
+      }
     }
-    idx <- which(x <= t)
-    x2  <- c(x[idx], t)
-    y2  <- c(y[idx], s_at(x, y, t))
-    trapz(x2, y2)
+    area
   }
   
-  S_obs_t <- vapply(years, function(tt) s_at(times, Sobs, tt), numeric(1))
-  S_ext_t <- vapply(years, function(tt) s_at(times, Sext, tt), numeric(1))
-  S_bl_t  <- vapply(years, function(tt) s_at(times, Sbl,  tt), numeric(1))
+  A_obs <- cumtrapz_from_t0(grid, Sobs_g)
+  A_ext <- cumtrapz_from_t0(grid, Sext_g)
+  A_bl  <- cumtrapz_from_t0(grid, Sbl_g)
   
-  RMST_obs <- vapply(years, function(tt) rmst_to(tt, times, Sobs), numeric(1))
-  RMST_ext <- vapply(years, function(tt) rmst_to(tt, times, Sext), numeric(1))
-  RMST_bl  <- vapply(years, function(tt) rmst_to(tt, times, Sbl ), numeric(1))
+  idx <- match(yrs, grid)
+  RMST_obs   <- A_obs[idx]
+  RMST_ext   <- A_ext[idx]
+  RMST_blend <- A_bl[idx]
+  
+  RMST_obs[order(yrs)]   <- cummax(RMST_obs[order(yrs)])
+  RMST_ext[order(yrs)]   <- cummax(RMST_ext[order(yrs)])
+  RMST_blend[order(yrs)] <- cummax(RMST_blend[order(yrs)])
+  
+  S_obs_t <- s_at(Sobs, yrs)
+  S_ext_t <- s_at(Sext, yrs)
+  S_bl_t  <- s_at(Sbl,  yrs)
   
   out <- data.frame(
-    time = years,
-    S_obs = S_obs_t,
-    S_ext = S_ext_t,
-    S_blend = S_bl_t,
-    RMST_obs = RMST_obs,
-    RMST_ext = RMST_ext,
-    RMST_blend = RMST_bl,
-    row.names = NULL
+    time       = yrs_in,
+    S_obs      = S_obs_t[match(yrs_in, yrs)],
+    S_ext      = S_ext_t[match(yrs_in, yrs)],
+    S_blend    = S_bl_t [match(yrs_in, yrs)],
+    RMST_obs   = RMST_obs  [match(yrs_in, yrs)],
+    RMST_ext   = RMST_ext  [match(yrs_in, yrs)],
+    RMST_blend = RMST_blend[match(yrs_in, yrs)],
+    row.names  = NULL,
+    check.names = FALSE
   )
+  
   out
 }
